@@ -21,8 +21,14 @@ async function glitchStart(opt: GlitchFormData) {
   const moviMarkerPos = new BoyerMoore("movi").findIndex(b);
   const idx1MarkerPos = new BoyerMoore("idx1").findIndex(b);
 
+  if(moviMarkerPos === -1 || idx1MarkerPos === -1) {
+    log("Markers not found, is this really an avi file?");
+    throw new Error("Not an avi file");
+  }
+
   log("movi marker pos: 0x" + moviMarkerPos.toString(16));
   log("idx1 marker pos: 0x" + idx1MarkerPos.toString(16));
+  
   
   const hdrlBuffer = b.slice(0, moviMarkerPos);
   const moviBuffer = b.slice(moviMarkerPos, idx1MarkerPos);
