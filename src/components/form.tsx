@@ -1,18 +1,18 @@
-import { Box, Heading, Grid, FileInput, Collapsible, ResponsiveContext, Form, Button, CheckBox, FormField, TextInput, } from 'grommet';
+import { Box, Heading, Grid, FileInput, Collapsible, ResponsiveContext, Form, Button, CheckBox, FormField, TextInput, Spinner, Meter } from 'grommet';
 import React, { useContext, useEffect, useState } from 'react';
-import { FormClock, FormRefresh } from 'grommet-icons';
+import { FormClock, FormRefresh, Magic } from 'grommet-icons';
 /** @jsx jsx */
 import { css, jsx } from '@emotion/react'
 import RecipeCard from './recipecard';
 import effects from '../worker/effects';
 
-export default function GlitchForm(props: {onSubmit: (data: GlitchFormData) => void}) {
+export default function GlitchForm(props: {onSubmit: (data: GlitchFormData) => void, disabled: boolean}) {
   const size = useContext(ResponsiveContext);
   const [selectedFile, setSelectedFile] = useState<File>();
   const [selectedEffect, setSelectedEffect] = useState<Effect>();
 
   function onFormSubmit(value: {keepFirstFrame?: boolean, interval?: number, count?: number}) {
-    if(!(selectedFile && selectedEffect)) return;
+    if(!(selectedFile && selectedEffect) || props.disabled) return;
 
     props.onSubmit({
       keepFirstFrame: value.keepFirstFrame === undefined ? true : value.keepFirstFrame,
@@ -29,6 +29,7 @@ export default function GlitchForm(props: {onSubmit: (data: GlitchFormData) => v
         <FileInput
           accept="video/avi"
           name="file"
+          disabled={props.disabled}
           onChange={event => {
             const fileList = event.target.files;
             if(!fileList) {
@@ -43,12 +44,12 @@ export default function GlitchForm(props: {onSubmit: (data: GlitchFormData) => v
       <Collapsible open={!!selectedFile}>
         <Box pad={{bottom: 'small'}} css={css`min-height: 236.33px; user-select: none;`}>
           <Heading level={3} margin={{top: "medium", bottom: "small"}}>Pick an effect</Heading>
-          <Grid columns={size !== 'small' ? 'small' : '100%'} gap="small">
+          <Grid columns={size !== 'small' ? 'small' : '100%'} gap="small" css={css`${props.disabled && 'filter: grayscale(60%);'}`}>
             {effects.map((effect, index) => {
               return <RecipeCard
                 title={effect.displayName}
                 video={effect.backgroundVideo}
-                onClick={() => {setSelectedEffect(effect)}}
+                onClick={() => {props.disabled || setSelectedEffect(effect)}}
                 key={effect.name}
                 isSelected={selectedEffect?.name === effect.name}
               ></RecipeCard>
@@ -91,10 +92,19 @@ export default function GlitchForm(props: {onSubmit: (data: GlitchFormData) => v
                 label="Keep first video frame?"
                 name="keepFirstFrame"
                 defaultChecked
+                disabled={props.disabled}
               />
             </FormField>
 
-            <Button primary type="submit" size="large" label="Nuke it!" css={css`max-width: 350px !important; border-radius: 4px !important;`} />
+            <Button
+              primary
+              type="submit"
+              size="large"
+              label={"Nuke it!"}
+              icon={props.disabled ? <Spinner size="small" /> : <Magic />}
+              disabled={props.disabled}
+              css={css`max-width: 350px !important; border-radius: 4px !important;`}
+            />
 
           </Form>
         </Box>
