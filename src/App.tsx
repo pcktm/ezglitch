@@ -1,4 +1,4 @@
-import { Box, Layer, Main, Paragraph, ResponsiveContext, Text } from 'grommet';
+import { Box, Footer, Layer, Main, Anchor, ResponsiveContext, Text } from 'grommet';
 import React, { Reducer, ReducerWithoutAction, useContext, useEffect, useReducer, useState } from 'react';
 import GlitchWorker from './worker?worker';
 import {MatomoProvider, createInstance} from '@datapunt/matomo-tracker-react'
@@ -87,6 +87,11 @@ function App() {
           }
 
           <Questions />
+
+          <Box pad={{top: 'large'}} as="footer">
+            <Text size="small">get the <Anchor href="https://github.com/pcktm/ezglitch">source</Anchor></Text>
+            <Text size="small">by <Anchor href="https://kopanko.com/?mtm_campaign=ezglitch&mtm_kwd=web">Jakub</Anchor></Text>
+          </Box>
 
         </Box>
       </Main>
