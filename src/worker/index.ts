@@ -8,7 +8,7 @@ function log(line: string) {
 }
 
 onmessage = ({data}: {data: {cmd: string, data: GlitchFormData}}) => {
-  console.log(data);
+  console.debug(data);
   if(data.cmd === 'begin') glitchStart(data.data)
 }
 

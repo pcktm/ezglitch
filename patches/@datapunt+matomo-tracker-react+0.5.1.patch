@@ -1,0 +1,13 @@
+diff --git a/node_modules/@datapunt/matomo-tracker-react/lib/useMatomo.d.ts b/node_modules/@datapunt/matomo-tracker-react/lib/useMatomo.d.ts
+index e65e5f8..55f5ccb 100644
+--- a/node_modules/@datapunt/matomo-tracker-react/lib/useMatomo.d.ts
++++ b/node_modules/@datapunt/matomo-tracker-react/lib/useMatomo.d.ts
+@@ -2,7 +2,7 @@ import { TrackEventParams, TrackLinkParams, TrackPageViewParams, TrackSiteSearch
+ declare function useMatomo(): {
+     trackEvent: (params: TrackEventParams) => void | undefined;
+     trackEvents: () => void | undefined;
+-    trackPageView: (params: TrackPageViewParams) => void | undefined;
++    trackPageView: (params?: TrackPageViewParams) => void | undefined;
+     trackSiteSearch: (params: TrackSiteSearchParams) => void | undefined;
+     trackLink: (params: TrackLinkParams) => void | undefined;
+     enableLinkTracking: () => void;

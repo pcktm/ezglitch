@@ -1,5 +1,5 @@
 import { Card, Stack, Image, Heading, Video } from 'grommet';
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 /** @jsx jsx */
 import { css, jsx } from '@emotion/react'
 
@@ -28,11 +28,20 @@ export default function RecipeCard(props: {title: string, img?: string, video?: 
   ${props.isSelected && 'border-style: solid;'}
   `
 
+  const player = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      console.debug('player playan')
+      player?.current?.play();
+    }, 650)
+  }, [])
+
   return (
     <Card pad="none" elevation="none" css={cardStyle} onClick={props.onClick}>
       <Stack anchor="center" fill >
         {
-          props.video && <Video controls={false} fit="cover" autoPlay loop mute  css={videoStyle}>
+          props.video && <Video controls={false} fit="cover" autoPlay loop mute playsInline css={videoStyle} ref={player}>
               <source key="video" src={props.video} type="video/mp4" />
           </Video>
         }

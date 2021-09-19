@@ -5,9 +5,11 @@ import { FormClock, FormRefresh, Magic } from 'grommet-icons';
 import { css, jsx } from '@emotion/react'
 import RecipeCard from './recipecard';
 import effects from '../worker/effects';
+import { useMatomo } from '@datapunt/matomo-tracker-react';
 
 export default function GlitchForm(props: {onSubmit: (data: GlitchFormData) => void, disabled: boolean}) {
   const size = useContext(ResponsiveContext);
+  const {trackEvent} = useMatomo();
   const [selectedFile, setSelectedFile] = useState<File>();
   const [selectedEffect, setSelectedEffect] = useState<Effect>();
 
@@ -38,6 +40,7 @@ export default function GlitchForm(props: {onSubmit: (data: GlitchFormData) => v
               return;
             };
             setSelectedFile(fileList[0]);
+            trackEvent({category: 'app', action: 'file selected'})
           }}
         />
       </Box>

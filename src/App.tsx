@@ -1,7 +1,7 @@
 import { Box, Footer, Layer, Main, Anchor, ResponsiveContext, Text } from 'grommet';
 import React, { Reducer, ReducerWithoutAction, useContext, useEffect, useReducer, useState } from 'react';
 import GlitchWorker from './worker?worker';
-import {MatomoProvider, createInstance} from '@datapunt/matomo-tracker-react'
+import {useMatomo} from '@datapunt/matomo-tracker-react'
 import save from 'save-file';
 import {customAlphabet} from 'nanoid';
 /** @jsx jsx */
@@ -32,10 +32,10 @@ function App() {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [logs, dispatchLogs] = useReducer(logReducer, []);
   const size = useContext(ResponsiveContext);
-
-
+  const {trackPageView, trackEvent} = useMatomo()
 
   useEffect(() => {
+    trackPageView();
     const w = new GlitchWorker();
     setWorker(w);
     w.onmessage = async (message) => {
@@ -44,6 +44,7 @@ function App() {
           await save(message.data.buffer, `out-${nanoid()}.avi`);
           setIsProcessing(false);
           dispatchLogs({type: 'clear'});
+          trackEvent({category: 'app', action: 'glitching finished'});
           break;
         case 'log':
           dispatchLogs({type: 'add', value: message.data.value});
@@ -56,46 +57,40 @@ function App() {
   }, [])
 
   function onFormSubmit(data: GlitchFormData) {
-    console.log(data);
+    console.debug(data);
+    trackEvent({category: 'app', action: 'glitching start', name: data.effect});
     worker?.postMessage({
       cmd: 'begin', data
     });
     setIsProcessing(true);
   }
 
-  const instance = createInstance({
-    urlBase: 'https://stats33.mydevil.net',
-    siteId: 121,
-  })
-
   return (
-    <MatomoProvider value={instance}>
-      <Main pad="xlarge">
-        <Box flex={false}>
-          <Header />
-          
-          <GlitchForm onSubmit={onFormSubmit} disabled={isProcessing} />
+    <Main pad="xlarge">
+      <Box flex={false}>
+        <Header />
+        
+        <GlitchForm onSubmit={onFormSubmit} disabled={isProcessing} />
 
-          {isProcessing && 
-            <Layer
-              animation="fadeIn"
-            >
-              <Box margin="large" css={[size !== 'small' && css`min-height: 250px; min-width: 600px`]}>
-                {logs.map((log, index) => <Text key={index}>{log}</Text>)}
-              </Box>
-            </Layer>
-          }
+        {isProcessing && 
+          <Layer
+            animation="fadeIn"
+          >
+            <Box margin="large" css={[size !== 'small' && css`min-height: 250px; min-width: 600px`]}>
+              {logs.map((log, index) => <Text key={index}>{log}</Text>)}
+            </Box>
+          </Layer>
+        }
 
-          <Questions />
+        <Questions />
 
-          <Box pad={{top: 'large'}} as="footer">
-            <Text size="small">get the <Anchor href="https://github.com/pcktm/ezglitch">source</Anchor></Text>
-            <Text size="small">by <Anchor href="https://kopanko.com/?mtm_campaign=ezglitch&mtm_kwd=web">Jakub</Anchor></Text>
-          </Box>
-
+        <Box pad={{top: 'large'}} as="footer">
+          <Text size="small">get the <Anchor href="https://github.com/pcktm/ezglitch">source</Anchor></Text>
+          <Text size="small">by <Anchor href="https://kopanko.com/?mtm_campaign=ezglitch&mtm_kwd=web">Jakub</Anchor></Text>
         </Box>
-      </Main>
-    </MatomoProvider>
+
+      </Box>
+    </Main>
   )
 }
 

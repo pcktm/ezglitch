@@ -6,6 +6,7 @@ import './styles/global.scss'
 import {Grommet} from 'grommet';
 import {dark, ThemeType } from 'grommet/themes';
 import {merge} from 'merge-anything'
+import {createInstance, MatomoProvider} from '@datapunt/matomo-tracker-react'
 
 const theme: ThemeType = {
   global: {
@@ -20,12 +21,18 @@ const theme: ThemeType = {
   }
 }
 
+const instance = createInstance({
+  urlBase: 'https://stats33.mydevil.net',
+  siteId: 121,
+})
 
 ReactDOM.render(
   <React.StrictMode>
-    <Grommet theme={merge(dark, theme) as ThemeType} full>
-      <App />
-    </Grommet>
+    <MatomoProvider value={instance}>
+      <Grommet theme={merge(dark, theme) as ThemeType} full>
+        <App />
+      </Grommet>
+    </MatomoProvider>
   </React.StrictMode>,
   document.getElementById('root')
 )
