@@ -3,11 +3,14 @@ import React, { Reducer, ReducerWithoutAction, useContext, useEffect, useReducer
 import GlitchWorker from './worker?worker';
 import {MatomoProvider, createInstance} from '@datapunt/matomo-tracker-react'
 import save from 'save-file';
+import {customAlphabet} from 'nanoid';
 /** @jsx jsx */
 import { css, jsx } from '@emotion/react'
 import GlitchForm from './components/form';
 import Questions from './components/faq';
 import Header from './components/header';
+
+const nanoid = customAlphabet('1234567890abcdef', 6)
 
 const logReducer: Reducer<string[], {type: string, value?: string}> = (state, action) => {
   switch (action.type) {
@@ -30,13 +33,15 @@ function App() {
   const [logs, dispatchLogs] = useReducer(logReducer, []);
   const size = useContext(ResponsiveContext);
 
+
+
   useEffect(() => {
     const w = new GlitchWorker();
     setWorker(w);
     w.onmessage = async (message) => {
       switch (message.data.type) {
         case 'result':
-          await save(message.data.buffer, 'out.avi');
+          await save(message.data.buffer, `out-${nanoid()}.avi`);
           setIsProcessing(false);
           dispatchLogs({type: 'clear'});
           break;
