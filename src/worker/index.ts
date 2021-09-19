@@ -1,6 +1,6 @@
 import save from 'save-file'
 import {BoyerMoore} from '../utils/boyer-moore';
-import {concatBuffers} from '../utils'
+import {formatBytes} from '../utils'
 import effects from './effects'
 
 function log(line: string) {
@@ -98,7 +98,7 @@ async function glitchStart(opt: GlitchFormData) {
   out.set(new Uint8Array(hdrlBuffer));
   out.set(finalMovi, moviMarkerPos);
   out.set(new Uint8Array(idx1Buffer), hdrlBuffer.byteLength + finalMovi.byteLength);
-  log('final size: ' + out.byteLength + ' bytes');
+  log('final size: ' + formatBytes(out.byteLength));
   log('sending buffer to main window');
   postMessage({type: 'result', buffer: out})
 }

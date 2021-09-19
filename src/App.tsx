@@ -75,7 +75,7 @@ function App() {
             <Layer
               animation="fadeIn"
             >
-              <Box margin="large" css={[size !== 'small' && css`min-height: 250px; min-width: 600px`, css`font-family: monospace;`]}>
+              <Box margin="large" css={[size !== 'small' && css`min-height: 250px; min-width: 600px`]}>
                 {logs.map((log, index) => <Text key={index}>{log}</Text>)}
               </Box>
             </Layer>
