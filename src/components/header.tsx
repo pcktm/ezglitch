@@ -8,7 +8,7 @@ export default function Header() {
     <>
     <Box direction="row" align="baseline" gap="xsmall">
       <Heading>ezglitch</Heading>
-      <Heading level="5" color="light-5">v1.0.0</Heading>
+      <Heading level="5" color="light-5">v1.1.0</Heading>
     </Box>
     <Paragraph css={css`max-width: 470px !important;`}>
       Blissfully easy <Text color="brand">video glitching</Text> based on the world&apos;s

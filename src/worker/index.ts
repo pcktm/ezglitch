@@ -80,33 +80,31 @@ async function glitchStart(opt: GlitchFormData) {
 
   log('final frames amount: ' + final.length)
 
-  if(final.length > 5000) log("that's a lot of frames, reconstruction will take a while!")
+  if(final.length > 5000) log("that's a lot of frames, reconstruction might take a while!")
 
-  log(`reconstructing movi buffer... 0%`)
-  let lastUpdateAt = new Date();
-  let finalMovi = new Uint8Array([0x6D, 0x6F, 0x76, 0x69]);
+  let expectedMoviSize = 4;
+  final.forEach(frame => expectedMoviSize+=frame.size);
+
+  let finalMovi = new Uint8Array(expectedMoviSize);
+  finalMovi.set([0x6D, 0x6F, 0x76, 0x69]);
+
+  let head = 4;
+
+  log(`reconstructing movi buffer...`);
+
   for (const [index, frame] of final.entries()) {
     if(frame.index != 0 && frame.size != 0) {
-      if((new Date().getTime() - lastUpdateAt.getTime()) / 1000 > 3) {
-        postMessage({type: 'log-updateLast', value: `reconstructing movi buffer... ${Math.round(index * 100 / final.length)}%`});
-        lastUpdateAt = new Date();
-      }
-
-      // TODO: I can get the final buffer size beforehand, no need to resize the array every iteration - massive speedup!
       const data = moviBuffer.slice(frame.index, frame.index + frame.size);
-      const tmp = new Uint8Array(data.byteLength + finalMovi.byteLength);
-      tmp.set(finalMovi, 0);
-      tmp.set(new Uint8Array(data), finalMovi.byteLength);
-      finalMovi = tmp;
+      finalMovi.set(new Uint8Array(data), head);
+      head += frame.size;
     }
   }
-  postMessage({type: 'log-updateLast', value: `reconstructing movi buffer... 100%`});
   
   let out = new Uint8Array(hdrlBuffer.byteLength + finalMovi.byteLength + idx1Buffer.byteLength); 
   out.set(new Uint8Array(hdrlBuffer));
   out.set(finalMovi, moviMarkerPos);
   out.set(new Uint8Array(idx1Buffer), hdrlBuffer.byteLength + finalMovi.byteLength);
   log('final size: ' + formatBytes(out.byteLength));
-  log('sending buffer to main window');
+  log('saving...');
   postMessage({type: 'result', buffer: out})
 }
