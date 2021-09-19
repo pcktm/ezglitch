@@ -19,7 +19,7 @@ export default function Questions() {
           What video formats are supported?
         </Heading>
         <Paragraph margin="none">
-          For the time being, we only support avi files. Which is pretty much self-explanatory since this is an avi index breaker.
+          For the time being, we only support avi files. This is pretty much self-explanatory since this is an avi index breaker.
         </Paragraph>
       </Box>
 
@@ -29,7 +29,7 @@ export default function Questions() {
         </Heading>
         <Paragraph margin="none">
           You bet! Mainly due to all the processing being done locally, in your browser.
-          You can still <Anchor href="https://ko-fi.com/pcktm" label="buy me a coffee" />, no pressure though.
+          You can still <Anchor href="https://ko-fi.com/pcktm" label="buy me a coffee" />, though no pressure.
         </Paragraph>
       </Box>
     </Box>

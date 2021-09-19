@@ -11,7 +11,7 @@ export default function Header() {
       <Heading level="5" color="light-5">v1.0.0</Heading>
     </Box>
     <Paragraph css={css`max-width: 470px !important;`}>
-      Blissfully easy <Text color="brand">video glitching</Text> based on world&apos;s
+      Blissfully easy <Text color="brand">video glitching</Text> based on the world&apos;s
       best avi index breaker. Now <Text color="brand">entirely in your browser</Text>.
     </Paragraph>
     </>
