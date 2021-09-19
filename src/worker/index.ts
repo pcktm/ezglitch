@@ -85,6 +85,8 @@ async function glitchStart(opt: GlitchFormData) {
         postMessage({type: 'log-updateLast', value: `reconstructing movi buffer... ${Math.round(index * 100 / final.length)}%`});
         lastUpdateAt = new Date();
       }
+
+      // TODO: I can get the final buffer size beforehand, no need to resize the array every iteration - massive speedup!
       const data = moviBuffer.slice(frame.index, frame.index + frame.size);
       const tmp = new Uint8Array(data.byteLength + finalMovi.byteLength);
       tmp.set(finalMovi, 0);
