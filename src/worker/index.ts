@@ -7,9 +7,16 @@ function log(line: string) {
   postMessage({type: 'log', value: line});
 }
 
-onmessage = ({data}: {data: {cmd: string, data: GlitchFormData}}) => {
+onmessage = async ({data}: {data: {cmd: string, data: GlitchFormData}}) => {
   console.debug(data);
-  if(data.cmd === 'begin') glitchStart(data.data)
+  if(data.cmd === 'begin') {
+    try {
+      await glitchStart(data.data);
+    } catch (e) {
+      postMessage({type: 'error', value: String(e)});
+      console.log(e);
+    }
+  } 
 }
 
 async function glitchStart(opt: GlitchFormData) {
@@ -21,9 +28,8 @@ async function glitchStart(opt: GlitchFormData) {
   const moviMarkerPos = new BoyerMoore("movi").findIndex(b);
   const idx1MarkerPos = new BoyerMoore("idx1").findIndex(b);
 
-  if(moviMarkerPos === -1 || idx1MarkerPos === -1) {
-    log("Markers not found, is this really an avi file?");
-    throw new Error("Not an avi file");
+  if(moviMarkerPos === -1 || idx1MarkerPos === -1 || true) {
+    throw "not an avi file!";
   }
 
   log("movi marker pos: 0x" + moviMarkerPos.toString(16));
@@ -61,7 +67,7 @@ async function glitchStart(opt: GlitchFormData) {
 
   if(opt.keepFirstFrame) {
     const ff = table.find(frame => frame.type === 'video');
-    if (!ff) throw new Error('This file has no video frames');
+    if (!ff) throw "This file has no video frames";
     clean.push(ff);
   }
 
@@ -73,14 +79,14 @@ async function glitchStart(opt: GlitchFormData) {
 
   // do effectz
   const effect = effects.find(({name}) => name === opt.effect);
-  if (!effect) throw new Error('Effect not found');
+  if (!effect) throw `Effect ${opt.effect} not found`;
 
   log('applying effect...')
   const final = await effect.apply(clean, opt);
 
   log('final frames amount: ' + final.length)
 
-  if(final.length > 5000) log("that's a lot of frames, reconstruction might take a while!")
+  if(final.length > 10000) log("that's a lot of frames, reconstruction might take a while!")
 
   let expectedMoviSize = 4;
   final.forEach(frame => expectedMoviSize+=frame.size);
@@ -105,6 +111,5 @@ async function glitchStart(opt: GlitchFormData) {
   out.set(finalMovi, moviMarkerPos);
   out.set(new Uint8Array(idx1Buffer), hdrlBuffer.byteLength + finalMovi.byteLength);
   log('final size: ' + formatBytes(out.byteLength));
-  log('saving...');
   postMessage({type: 'result', buffer: out})
 }

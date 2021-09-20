@@ -1,4 +1,4 @@
-import { Box, Footer, Layer, Main, Anchor, ResponsiveContext, Text } from 'grommet';
+import { Box, Footer, Layer, Main, Anchor, ResponsiveContext, Text, Button } from 'grommet';
 import React, { Reducer, ReducerWithoutAction, useContext, useEffect, useReducer, useState } from 'react';
 import GlitchWorker from './worker?worker';
 import {useMatomo} from '@datapunt/matomo-tracker-react'
@@ -12,16 +12,17 @@ import Header from './components/header';
 
 const nanoid = customAlphabet('1234567890abcdef', 6)
 
-const logReducer: Reducer<string[], {type: string, value?: string}> = (state, action) => {
-  switch (action.type) {
-    case 'add':
-      return [...state, action.value || ''];
+type LogLine = {line: string, color: string}
+const logReducer: Reducer<LogLine[], {type: string, value?: string}> = (state, {type, value = ''}) => {
+  switch (type) {
+    case 'log':
+      return [...state, {line: value, color: 'light-1'}];
     case 'clear':
       return [];
-    case 'updateLast':
-      const temp = state.slice(0, -1);
-      temp.push(action.value || '');
-      return temp;
+    case 'error':
+      return [...state, {line: 'error: ' + value, color: 'status-error'}];
+    case 'success':
+      return [...state, {line: value, color: 'status-ok'}];
     default:
       return state;
   }
@@ -30,6 +31,7 @@ const logReducer: Reducer<string[], {type: string, value?: string}> = (state, ac
 function App() {
   const [worker, setWorker] = useState<Worker>();
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const [logsOpen, setLogsOpen] = useState<boolean>(false);
   const [logs, dispatchLogs] = useReducer(logReducer, []);
   const size = useContext(ResponsiveContext);
   const {trackPageView, trackEvent} = useMatomo()
@@ -41,28 +43,34 @@ function App() {
     w.onmessage = async (message) => {
       switch (message.data.type) {
         case 'result':
+          dispatchLogs({type: 'success', value: 'saving...'});
+          trackEvent({category: 'app', action: 'glitching finished'});
           await save(message.data.buffer, `out-${nanoid()}.avi`);
           setIsProcessing(false);
-          dispatchLogs({type: 'clear'});
-          trackEvent({category: 'app', action: 'glitching finished'});
           break;
         case 'log':
-          dispatchLogs({type: 'add', value: message.data.value});
+          dispatchLogs({type: 'log', value: message.data.value});
           break;
-        case 'log-updateLast':
-          dispatchLogs({type: 'updateLast', value: message.data.value});
+        case 'error':
+          dispatchLogs({type: 'error', value: message.data.value});
+          trackEvent({category: 'app', action: 'error', name: message.data.value});
           break;
       }
     }
-  }, [])
+  }, []);
+
+  function hideLogs() {
+    dispatchLogs({type: 'clear'});
+    setLogsOpen(false);
+  }
 
   function onFormSubmit(data: GlitchFormData) {
-    console.debug(data);
     trackEvent({category: 'app', action: 'glitching start', name: data.effect});
     worker?.postMessage({
       cmd: 'begin', data
     });
     setIsProcessing(true);
+    setLogsOpen(true);
   }
 
   return (
@@ -72,12 +80,17 @@ function App() {
         
         <GlitchForm onSubmit={onFormSubmit} disabled={isProcessing} />
 
-        {isProcessing && 
+        {logsOpen && 
           <Layer
             animation="fadeIn"
           >
             <Box margin="large" css={[size !== 'small' && css`min-height: 250px; min-width: 600px`]}>
-              {logs.map((log, index) => <Text key={index}>{log}</Text>)}
+              {logs.map((log, index) => <Text key={index} color={log.color}>{log.line}</Text>)}
+              {logs.some(log => log.color === 'status-error') &&
+                <Box direction="row" margin={{top: 'medium'}}>
+                  <Button color="#FF4040" primary label="Close logs" fill={false} onClick={() => {hideLogs(), setIsProcessing(false)}}/>
+                </Box>
+              }
             </Box>
           </Layer>
         }
