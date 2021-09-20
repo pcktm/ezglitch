@@ -23,6 +23,8 @@ const logReducer: Reducer<LogLine[], {type: string, value?: string}> = (state, {
       return [...state, {line: 'error: ' + value, color: 'status-error'}];
     case 'success':
       return [...state, {line: value, color: 'status-ok'}];
+    case 'warning':
+      return [...state, {line: value, color: 'status-warning'}];
     default:
       return state;
   }
@@ -46,10 +48,14 @@ function App() {
           dispatchLogs({type: 'success', value: 'saving...'});
           trackEvent({category: 'app', action: 'glitching finished'});
           await save(message.data.buffer, `out-${nanoid()}.avi`);
+          hideLogs();
           setIsProcessing(false);
           break;
         case 'log':
           dispatchLogs({type: 'log', value: message.data.value});
+          break;
+        case 'warning':
+          dispatchLogs({type: 'warning', value: message.data.value});
           break;
         case 'error':
           dispatchLogs({type: 'error', value: message.data.value});
@@ -84,7 +90,7 @@ function App() {
           <Layer
             animation="fadeIn"
           >
-            <Box margin="large" css={[size !== 'small' && css`min-height: 250px; min-width: 600px`]}>
+            <Box margin="large" css={[size !== 'small' && css`min-height: 265px; min-width: 600px`]}>
               {logs.map((log, index) => <Text key={index} color={log.color}>{log.line}</Text>)}
               {logs.some(log => log.color === 'status-error') &&
                 <Box direction="row" margin={{top: 'medium'}}>

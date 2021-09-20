@@ -86,7 +86,7 @@ async function glitchStart(opt: GlitchFormData) {
 
   log('final frames amount: ' + final.length)
 
-  if(final.length > 10000) log("that's a lot of frames, reconstruction might take a while!")
+  if(final.length > 5000) postMessage({type: 'warning', value: "that's a lot of frames, may become unstable"});
 
   let expectedMoviSize = 4;
   final.forEach(frame => expectedMoviSize+=frame.size);
