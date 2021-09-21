@@ -9,8 +9,7 @@ export default function Questions() {
           How does this work?
         </Heading>
         <Paragraph margin="none">
-          In short, avi files have a sort of "table of contents" which we reorder.
-          Based on excellent <Anchor href="https://github.com/itsKaspar/tomato" label="tomato" />.
+          In short, we reorder or duplicate the actual frames inside the video. Since compressed frames are freaky, weird results ensure.
         </Paragraph>
       </Box>
 

@@ -41,8 +41,8 @@ async function glitchStart(opt: GlitchFormData) {
   const idx1Buffer = b.slice(idx1MarkerPos);
   
   // construct frame table
-  // const iframes: Omit<Frame, 'size'>[] = new BoyerMoore(new Uint8Array([0x30, 0x31, 0x77, 0x62])).findIndexes(moviBuffer)
-  //   .map(v => {return {type: 'audio', index: v}});
+  const iframes: Omit<Frame, 'size'>[] = new BoyerMoore(new Uint8Array([0x30, 0x31, 0x77, 0x62])).findIndexes(moviBuffer)
+    .map(v => {return {type: 'audio', index: v}});
   const bframes: Omit<Frame, 'size'>[] = new BoyerMoore(new Uint8Array([0x30, 0x30, 0x64, 0x63])).findIndexes(moviBuffer)
     .map(v => {return {type: 'video', index: v}});
   

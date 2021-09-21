@@ -104,7 +104,7 @@ function App() {
         <Questions />
 
         <Box pad={{top: 'large'}} as="footer">
-          <Text size="small">get the <Anchor href="https://github.com/pcktm/ezglitch">source</Anchor></Text>
+          <Text size="small">based on <Anchor href="https://github.com/itsKaspar/tomato" label="tomato" />, get the <Anchor href="https://github.com/pcktm/ezglitch">source</Anchor></Text>
           <Text size="small">by <Anchor href="https://kopanko.com/?mtm_campaign=ezglitch&mtm_kwd=web">Jakub</Anchor></Text>
         </Box>
 
