@@ -57,12 +57,15 @@ export const Pulse: Effect = {
   async apply(table: Frame[], options: GlitchFormData): Promise<Frame[]> {
     if(!(options.count && options.interval)) throw new Error("Malformed options");
     let final: Frame[] = [];
+    let index = 0;
     for (const frame of table) {
-      let i = 0;
-      while (i < options.count) {
-        final.push(frame)
-        i++;
+      final.push(frame);
+      if (index % options.interval === 0) {
+        for (let j = 0; j < options.count; j++) {
+          final.push(frame);
+        }
       }
+      index++;
     }
     return final;
   }

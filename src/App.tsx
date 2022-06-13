@@ -39,7 +39,7 @@ function App() {
   const {trackPageView, trackEvent} = useMatomo()
 
   useEffect(() => {
-    trackPageView();
+    trackPageView({});
     const w = new GlitchWorker();
     setWorker(w);
     w.onmessage = async (message) => {
